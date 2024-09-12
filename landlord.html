@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Landlord</title>
+    <link rel="stylesheet" href="{% static 'licenta/stil.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('{% static 'licenta/background.jpg' %}');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+        }
+        header h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 15px;
+            background-color: #555;
+            border-radius: 5px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        nav a:hover, nav a.active {
+            background-color: #777;
+            font-weight: bold;
+        }
+        .main-container {
+            text-align: center;
+            padding: 50px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            width: 800px;
+            margin: 100px auto;
+        }
+        .main-container h2, .main-container p, .main-container h3 {
+            text-align: center;
+        }
+        .hotel-list {
+            list-style: none;
+            padding: 0;
+        }
+        .hotel-item {
+            background-color: rgba(255, 255, 255, 0.3); /* Fundal mai transparent */
+            color: #fff; /* Schimbare de culoare a textului */
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.5); /* Border transparent */
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow pentru un aspect mai frumos */
+        }
+        .hotel-info {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .hotel-info h3 {
+            margin: 0;
+        }
+        .hotel-info p {
+            margin: 5px 0;
+        }
+        .hotel-rating {
+            font-size: 1.2em;
+            color: #FFD700; /* Gold color for stars */
+            position: relative;
+            border: 1px solid #000; /* Black border for stars */
+            padding: 2px 5px;
+            border-radius: 5px;
+            background-color: #000; /* Black background for contrast */
+            color: #FFD700; /* Gold color for stars */
+            text-shadow: 2px 2px 4px #000;
+        }
+        .edit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff9900;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .edit-button:hover {
+            background-color: #cc7a00;
+        }
+        /* Stil pentru overlay și modal */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow-y: auto; /* Permite scroll pe verticală */
+        }
+        .overlay-content {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            width: 600px; /* Mărit lățimea formularului */
+            max-width: 90%; /* Pentru a preveni problemele de afișare pe ecrane mici */
+            color: #fff;
+            margin: auto; /* Asigură centrare pe verticală */
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: 24px;
+            text-align: center;
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: left;
+        }
+        .modal-content input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+        }
+        .modal-content input::placeholder {
+            color: #ccc;
+        }
+        .modal-content button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #555;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold; /* Adăugat pentru grosime mai mare */
+            cursor: pointer;
+        }
+        .modal-content button:hover {
+            background-color: #777;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-content input[type="checkbox"] {
+            transform: scale(1.3); /* Mărește checkbox-ul */
+            margin-right: 10px; /* Spațiu între checkbox și label */
+            cursor: pointer; /* Schimbă cursorul când treci peste checkbox */
+        }
+        .modal-content label[for="confirm"] {
+            font-size: 16px;
+            cursor: pointer; /* Schimbă cursorul când treci peste label */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Profil Landlord</h1>
+        <nav>
+            <a href="{% url 'landlord-view' %}" class="active">Hotelurile tale</a>
+            <a href="{% url 'newhotel-view' %}">Listează un hotel</a>
+            <a href="{% url 'logout-view' %}">Deconectare</a>
+        </nav>
+    </header>
+    {% if user.role == 'landlord' %}
+    <div class="main-container">
+        <h2>Bun venit, {{ user.name }}</h2>
+        <p>Aici puteți vedea lista hotelurilor pe care le administrați.</p>
+        <h3>Hotelurile tale:</h3>
+        <ul class="hotel-list">
+            {% for hotel in hotels %}
+            <li class="hotel-item">
+                <div class="hotel-info">
+                    <h3>{{ hotel.name }}</h3>
+                    <p>Adresă: {{ hotel.address }}</p>
+                    <p>Locație: {{ hotel.location }}</p>
+                    <p>Facilități: {{ hotel.amenities|join:", " }}</p>
+                    <p>Telefon: {{ hotel.phone }}</p>
+                    <p>Preț: {{ hotel.money }} RON/noapte</p>
+                </div>
+                <div class="hotel-rating">{{ hotel.average_rating|floatformat:1 }} ★</div>
+                <!-- Buton de Editare -->
+                <button class="edit-button" onclick="openEditForm('{{ hotel.id }}')">✏️ Editare</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <!-- Overlay pentru editare -->
+    <div id="edit-overlay" class="overlay">
+        <div class="overlay-content modal-content">
+            <span class="close-button close" onclick="closeEditForm()">✖</span>
+            <h2>Editare Hotel</h2>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" id="hotel-id" name="hotel_id" value="{{ hotel.id }}">
+                
+                <label for="name">Nume hotel:</label>
+                <input type="text" id="name" name="name" required>
+                
+                <label for="address">Adresă:</label>
+                <input type="text" id="address" name="address" required>
+                
+                <label for="location">Locație:</label>
+                <input type="text" id="location" name="location" required>
+                
+                <label for="amenities">Facilități (separate prin virgulă):</label>
+                <input type="text" id="amenities" name="amenities" required>
+                
+                <label for="phone">Telefon:</label>
+                <input type="text" id="phone" name="phone" required>
+                
+                <label for="money">Preț per noapte (RON):</label>
+                <input type="number" step="0.01" id="money" name="money" required>
+
+                <div class="checkbox-container">
+                    <label for="confirm">Confirm modificările</label>
+                    <input type="checkbox" id="confirm" name="confirm" value="yes">
+                </div>
+                
+                <button type="submit" id="save-button" disabled>Salvează modificările</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+        <script type="text/javascript">
+            window.location.href = "{% url 'profile-view' %}";
+        </script>
+    {% endif %}
+    
+    <script>
+        function openEditForm(hotelId) {
+            document.getElementById('edit-overlay').style.display = 'flex';
+            
+            // Populați formularul cu datele hotelului existent
+            var hotelElement = document.querySelector(`[onclick="openEditForm('${hotelId}')"]`).closest('.hotel-item');
+            document.getElementById('hotel-id').value = hotelId;
+            document.getElementById('name').value = hotelElement.querySelector('.hotel-info h3').innerText;
+            document.getElementById('address').value = hotelElement.querySelector('.hotel-info p:nth-child(2)').innerText.split(': ')[1];
+            document.getElementById('location').value = hotelElement.querySelector('.hotel-info p:nth-child(3)').innerText.split(': ')[1];
+            document.getElementById('amenities').value = hotelElement.querySelector('.hotel-info p:nth-child(4)').innerText.split(': ')[1];
+            document.getElementById('phone').value = hotelElement.querySelector('.hotel-info p:nth-child(5)').innerText.split(': ')[1];
+            document.getElementById('money').value = hotelElement.querySelector('.hotel-info p:nth-child(6)').innerText.split(': ')[1].replace(' RON/noapte', '');
+            
+            // Setează acțiunea formularului către URL-ul corect
+            document.querySelector('#edit-overlay form').action = `/edit-hotel/${hotelId}/`;
+        }
+
+        function closeEditForm() {
+            document.getElementById('edit-overlay').style.display = 'none';
+        }
+
+        document.getElementById('confirm').addEventListener('change', function() {
+            document.getElementById('save-button').disabled = !this.checked;
+        });
+    </script>
+</body>
+</html>

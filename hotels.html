@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoteluri</title>
+    <link rel="stylesheet" href="{% static 'licenta/stil.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('{% static 'licenta/background.jpg' %}');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+        }
+        header h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 15px;
+            background-color: #555;
+            border-radius: 5px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        nav a:hover {
+            background-color: #777;
+        }
+        .main-container {
+            text-align: center;
+            padding: 50px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            width: 800px;
+            margin: 100px auto;
+        }
+        .main-container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .hotel-list {
+            list-style: none;
+            padding: 0;
+        }
+        .hotel-item {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-shadow: none;
+            border: 1px solid #ddd;
+        }
+        .hotel-info {
+            text-align: left;
+        }
+        .hotel-info h3 {
+            margin: 0;
+        }
+        .hotel-info p {
+            margin: 5px 0;
+        }
+        .hotel-rating {
+            font-size: 1.2em;
+            color: #FFD700; /* Gold color for stars */
+            position: relative;
+            border: 1px solid #000; /* Black border for stars */
+            padding: 2px 5px;
+            border-radius: 5px;
+            background-color: #000; /* Black background for contrast */
+            color: #FFD700; /* Gold color for stars */
+            text-shadow: 2px 2px 4px #000;
+        }
+        .list-hotel-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #555;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .list-hotel-button:hover {
+            background-color: #777;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .modal-content input {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hoteluri</h1>
+        <nav>
+            <a href="{% url 'home-view' %}">Acasă</a>
+            <a href="{% url 'login-view' %}">Autentificare</a>
+            <a href="{% url 'profile-view' %}">Profil</a>
+            <a href="{% url 'recommendations-view' %}">Recomandări</a>
+        </nav>
+    </header>
+    <div class="main-container">
+        <h2>Lista Hoteluri Deținute</h2>
+        <ul class="hotel-list">
+            {% for hotel in hotels %}
+            <li class="hotel-item">
+                <div class="hotel-info">
+                    <h3>{{ hotel.name }}</h3>
+                    <p>Adresă: {{ hotel.address }}</p>
+                    <p>Facilități: {{ hotel.amenities }}</p>
+                    <p>Telefon: {{ hotel.phone }}</p>
+                    <p>Preț: {{ hotel.price }} RON/noapte</p>
+                </div>
+                <div class="hotel-rating" data-reviews="{{ hotel.review_count }}">{{ hotel.average_rating }} ★</div>
+            </li>
+            {% endfor %}
+        </ul>
+        <button class="list-hotel-button" id="listHotelButton">List your own hotel</button>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>List your own hotel</h2>
+            <form action="{% url 'list_hotel' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="nume_hotel" placeholder="Nume Hotel" required>
+                <input type="text" name="adresa" placeholder="Adresă" required>
+                <input type="text" name="locatie" placeholder="Locație" required>
+                <input type="text" name="categorii" placeholder="Categorii" required>
+                <input type="text" name="facilitati" placeholder="Facilități" required>
+                <input type="text" name="telefon" placeholder="Telefon" required>
+                <input type="number" name="numar_recenzii" placeholder="Număr Recenzii" required>
+                <input type="number" step="0.1" name="rating_mediu" placeholder="Rating Mediu" required>
+                <input type="number" step="0.000001" name="latitudine" placeholder="Latitudine" required>
+                <input type="number" step="0.000001" name="longitudine" placeholder="Longitudine" required>
+                <input type="number" name="pret" placeholder="Preț (RON/noapte)" required>
+                <button type="submit">Adaugă Hotel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var modal = document.getElementById("registerModal");
+        var btn = document.getElementById("listHotelButton");
+        var span = document.getElementById("closeModal");
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

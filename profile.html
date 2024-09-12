@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil</title>
+    <link rel="stylesheet" href="{% static 'licenta/stil.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('{% static 'licenta/background.jpg' %}');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+        }
+        header h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 15px;
+            background-color: #555;
+            border-radius: 5px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        nav a:hover, nav a.active {
+            background-color: #777;
+            font-weight: bold;
+        }
+        .main-container {
+            text-align: center;
+            padding: 50px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            width: 800px;
+            margin: 100px auto;
+        }
+        .main-container h2, .main-container p, .main-container h3 {
+            text-align: center;
+        }
+        .hotel-list {
+            list-style: none;
+            padding: 0;
+        }
+        .hotel-item {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-shadow: none;
+            border: 1px solid #ddd;
+        }
+        .hotel-info {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .hotel-info h3 {
+            margin: 0;
+        }
+        .hotel-info p {
+            margin: 5px 0;
+        }
+        .hotel-rating {
+            font-size: 1.2em;
+            color: #FFD700; /* Gold color for stars */
+            position: relative;
+            border: 1px solid #000; /* Black border for stars */
+            padding: 2px 5px;
+            border-radius: 5px;
+            background-color: #000; /* Black background for contrast */
+            color: #FFD700; /* Gold color for stars */
+            text-shadow: 2px 2px 4px #000;
+        }
+        .review-section {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .review-section label {
+            margin-right: 10px;
+        }
+        .review-section .star-rating {
+            direction: rtl;
+            display: inline-flex;
+        }
+        .review-section .star-rating input {
+            display: none;
+        }
+        .review-section .star-rating label {
+            font-size: 1.5em;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .review-section .star-rating label:before {
+            content: '★';
+        }
+        .review-section .star-rating input:checked ~ label {
+            color: #FFD700;
+        }
+        .review-section .star-rating label:hover,
+        .review-section .star-rating label:hover ~ label {
+            color: #FFD700;
+        }
+        .review-message {
+            margin-top: 10px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Profil Utilizator</h1>
+        <nav>
+            <a href="{% url 'profile-view' %}" class="active">Profilul tău</a>
+            <a href="{% url 'acasa-view' %}">Fă o rezervare</a>
+            <a href="{% url 'logout-view' %}">Deconectare</a>
+        </nav>
+    </header>
+    {% if user.role == 'renter' %}
+    <div class="main-container">
+        <h2>Bun venit, {{ user.name }}</h2>
+        <p>Aici puteți vedea și actualiza informațiile despre profilul dvs.</p>
+        <h3>Șederile tale anterioare:</h3>
+        <ul class="hotel-list">
+            {% for stay in past_stays %}
+            <li class="hotel-item">
+                <div class="hotel-info">
+                    <h3>{{ stay.hotel.name }}</h3>
+                    <p>Adresă: {{ stay.hotel.address }}</p>
+                    <p>Facilități: 
+                        {{ stay.hotel.amenities|cut:"["|cut:"]"|cut:"'" }}
+                    </p>
+                    <p>Telefon: {{ stay.hotel.phone }}</p>
+                </div>
+                <div class="hotel-rating">{{ stay.hotel.average_rating|floatformat:1 }} ★</div>
+                {% if stay.rating %}
+                    <div class="review-message">Ați oferit {{ stay.rating }}/5 stele</div>
+                {% else %}
+                    <form method="post" action="{% url 'submit_review' stay.id %}">
+                        {% csrf_token %}
+                        <div class="review-section">
+                            <label>Lasă o recenzie:</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5-{{ forloop.counter }}" name="rating" value="5"><label for="star5-{{ forloop.counter }}" title="5 stars">5</label>
+                                <input type="radio" id="star4-{{ forloop.counter }}" name="rating" value="4"><label for="star4-{{ forloop.counter }}" title="4 stars">4</label>
+                                <input type="radio" id="star3-{{ forloop.counter }}" name="rating" value="3"><label for="star3-{{ forloop.counter }}" title="3 stars">3</label>
+                                <input type="radio" id="star2-{{ forloop.counter }}" name="rating" value="2"><label for="star2-{{ forloop.counter }}" title="2 stars">2</label>
+                                <input type="radio" id="star1-{{ forloop.counter }}" name="rating" value="1"><label for="star1-{{ forloop.counter }}" title="1 star">1</label>
+                            </div>
+                            <button type="submit">Trimite recenzia</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Șederile tale viitoare:</h3>
+        <ul class="hotel-list">
+            {% for stay in future_stays %}
+            <li class="hotel-item">
+                <div class="hotel-info">
+                    <h3>{{ stay.hotel.name }}</h3>
+                    <p>Adresă: {{ stay.hotel.address }}</p>
+                    <p>Facilități: {{ stay.hotel.amenities }}</p>
+                    <p>Telefon: {{ stay.hotel.phone }}</p>
+                </div>
+                <div class="hotel-rating">{{ stay.hotel.average_rating|floatformat:1 }} ★</div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+        <script type="text/javascript">
+            window.location.href = "{% url 'landlord-view' %}";
+        </script>
+    {% endif %}
+</body>
+</html>
