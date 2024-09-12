@@ -1,5 +1,7 @@
 Hello Reader! :)
 
+Before starting, I would like to apologize for the use of Romanian in this project - this was the project that earned my Engineering Diploma, so I used my natal language in the documentation and in some comments throughout the project. If you need my help with translation, please ask me! (Or ask ChatGPT directly haha)
+
 Thank you for checking out this project. This web application offers personalized hotel recommendations based on user preferences, and it's built using Django, SQLite, HTML, CSS, and JavaScript. Below, I’ll walk you through how to set up everything and get it running.
 
 Getting Started
